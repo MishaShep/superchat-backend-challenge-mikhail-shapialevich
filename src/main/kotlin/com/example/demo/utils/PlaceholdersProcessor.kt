@@ -3,6 +3,7 @@ package com.example.demo.utils
 import com.example.demo.enums.Placeholder
 import com.example.demo.models.dto.SendMessageDto
 import com.example.demo.services.UserService
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 
@@ -12,6 +13,9 @@ class PlaceholdersProcessor(
     private val userService: UserService,
     private val bitcoinPriceUtil: BitcoinPriceUtil
 ) {
+
+    @Value("\${punctuation.marks}")
+    lateinit var punctuationMarks: String
 
     fun processPlaceholders(request: SendMessageDto): String {
         val placeholders = getPlaceholdersSet(request.text)
@@ -36,35 +40,20 @@ class PlaceholdersProcessor(
 
     private fun processPlaceholder(placeholder: Placeholder, request: SendMessageDto): String {
         return when (placeholder) {
-            Placeholder.FULL_NAME -> getUserFullName()
-            Placeholder.BITCOIN -> getBictoinExchangeRate()
-            Placeholder.CONTACT_NAME -> getContactFullName(request.messageTo)
+            Placeholder.FULL_NAME -> {
+                userService.getUserByNickname(SecurityContextHolder.getContext().authentication.name).getFullName()
+            }
+
+            Placeholder.BITCOIN -> bitcoinPriceUtil.getBitcoinPrice()
+            Placeholder.CONTACT_NAME -> userService.getFullNameById(request.messageTo)
         }
     }
 
-    private fun getUserFullName(): String {
-        val user = userService.getUserByNickname(SecurityContextHolder.getContext().authentication.name)
-        return "${user.firstName} ${user.lastName}"
-    }
-
-    private fun getBictoinExchangeRate(): String {
-        return bitcoinPriceUtil.getBitcoinPrice()
-    }
-
-    private fun getContactFullName(id: Long): String {
-        return userService.getFullNameById(id)
-    }
-
     private fun removePunctuationMarks(placeholder: String): String {
-        return placeholder.replace(".", "")
-            .replace(":", "")
-            .replace(",", "")
-            .replace("?", "")
-            .replace("!", "")
-            .replace(";", "")
-            .replace("\"", "")
-            .replace("\'", "")
-            .replace(")", "")
-            .replace("(", "")
+        var updatedPlaceholder = placeholder
+        for (mark in punctuationMarks) {
+            updatedPlaceholder = updatedPlaceholder.replace(mark.toString(), "")
+        }
+        return updatedPlaceholder
     }
 }

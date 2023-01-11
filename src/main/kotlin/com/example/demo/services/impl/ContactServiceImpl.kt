@@ -13,12 +13,12 @@ class ContactServiceImpl(
 
     override fun getAllContactsList(): List<ContactDto> {
         return userRepo.findAll()
-            .filter { it.username != SecurityContextHolder.getContext().authentication.name }
+            .filter { it.nickname != SecurityContextHolder.getContext().authentication.name }
             .map { user ->
                 ContactDto(
                     id = user.id!!,
                     nickname = user.nickname,
-                    fullName = "${user.firstName} ${user.lastName}",
+                    fullName = user.getFullName(),
                     email = user.email
                 )
             }
@@ -29,7 +29,7 @@ class ContactServiceImpl(
             ContactDto(
                 id = it.id!!,
                 nickname = it.nickname,
-                fullName = "${it.firstName} ${it.lastName}",
+                fullName = it.getFullName(),
                 email = it.email
             )
         }
@@ -40,7 +40,7 @@ class ContactServiceImpl(
             ContactDto(
                 id = it.id!!,
                 nickname = it.nickname,
-                fullName = "${it.firstName} ${it.lastName}",
+                fullName = it.getFullName(),
                 email = it.email
             )
         }

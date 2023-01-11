@@ -6,6 +6,7 @@ import com.example.demo.models.entity.ExternalMessage
 import com.example.demo.models.entity.Message
 
 interface MessagesService {
+
     fun getAllMessages(): ConversationsDto
 
     fun sendNewMessage(request: SendMessageDto): Message

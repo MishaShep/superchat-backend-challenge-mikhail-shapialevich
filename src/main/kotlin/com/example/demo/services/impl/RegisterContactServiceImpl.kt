@@ -14,6 +14,7 @@ class RegisterContactServiceImpl(
     private val userRepo: UserRepository,
     private val passwordEncoder: PasswordEncoder
 ) : RegisterContactService {
+
     override fun registerContact(request: RegisterContactDto): ContactDto {
         if (request.password != request.passwordConfirm)
             throw AuthenticationException("password and password confirm do not match")

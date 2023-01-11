@@ -9,7 +9,7 @@ import com.example.demo.services.ExternalServiceWebHookService
 import com.example.demo.services.MessagesService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
-import java.util.*
+import java.util.UUID
 
 @Service
 class ExternalServiceWebHookServiceImpl(

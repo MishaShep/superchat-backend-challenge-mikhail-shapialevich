@@ -26,15 +26,16 @@ class MessagesServiceImpl(
 
     override fun getAllMessages(): ConversationsDto {
         val principleUser = getPrincipleUser()
-        val messages = messagesRepo.findAllByMessageFromOrMessageTo(principleUser.id, principleUser.id)
-        val externalMessages = externalMessageRepository.findAllByMessageTo(principleUser.id)
+        val messages = messagesRepo.findAllByMessageFromIdOrMessageToId(principleUser.id, principleUser.id)
+        val externalMessages = externalMessageRepository.findAllByMessageToId(principleUser.id)
 
         val conversationDtos = messages
             .groupBy { it.toKey() }
-            .map { (contact, messageList) ->
+            .map { (contactId, messageList) ->
+                val contact = contactService.getContactByUserId(contactId)
                 val conversationMessages = messageList.sortedByDescending { it.createdDate }.map {
                     ConversationMessageDto(
-                        messageSender = if (it.messageFrom == principleUser.id) principleUser.fullName else contact.fullName,
+                        messageSender = if (it.messageFromId == principleUser.id) principleUser.fullName else contact.fullName,
                         text = it.text,
                         createdDate = it.createdDate!!
                     )
@@ -75,8 +76,8 @@ class MessagesServiceImpl(
         return messagesRepo.save(
             Message(
                 text = placeholderProcessor.processPlaceholders(request),
-                messageFrom = principleUser.id,
-                messageTo = request.messageTo,
+                messageFromId = principleUser.id,
+                messageToId = request.messageTo,
             )
         )
     }
@@ -88,16 +89,15 @@ class MessagesServiceImpl(
             ExternalMessage(
                 text = request.text,
                 messageFrom = serviceName,
-                messageTo = request.messageTo
+                messageToId = request.messageTo
             )
         )
     }
 
-    private fun Message.toKey(): ContactDto {
+    private fun Message.toKey(): Long {
         val principleUser = getPrincipleUser()
-        val contactId = if (this.messageFrom == principleUser.id) this.messageTo
-        else this.messageFrom
-        return contactService.getContactByUserId(contactId)
+        return if (this.messageFromId == principleUser.id) this.messageToId
+        else this.messageFromId
     }
 
     private fun getPrincipleUser(): ContactDto {

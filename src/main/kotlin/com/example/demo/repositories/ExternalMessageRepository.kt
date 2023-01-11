@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface ExternalMessageRepository: JpaRepository<ExternalMessage, Long> {
-    fun findAllByMessageTo(id: Long): List<ExternalMessage>
+    fun findAllByMessageToId(id: Long): List<ExternalMessage>
 }

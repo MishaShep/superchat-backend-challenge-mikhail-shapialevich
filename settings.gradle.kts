@@ -1,1 +1,1 @@
-rootProject.name = "demo"
+rootProject.name = "superchat-backend-challenge-mikhail-shapialevich"
