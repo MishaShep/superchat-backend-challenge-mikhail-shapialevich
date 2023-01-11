@@ -8,3 +8,8 @@ Steps to explore app:
 4) go to http://localhost:8080/swagger-ui/index.html to explore endpoints and schemas for the app
 
 **NOTE**: for secured endpoints used Basic Authentication (username:password)
+
+Available placeholders: 
+1) @fullname - fullname of user who send the message
+2) @contact - fullname of the contact to whom message send
+3) @bitcoin - current bitcoin price in USD
